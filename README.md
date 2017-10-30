@@ -1,5 +1,5 @@
 # Mn_Classifier_CNNs
-A convolutional neural network classifier for determining the oxidation state of Manganese in electron energy-loss spectroscopy
+A convolutional neural network (CNN) classifier for determining the oxidation state of Manganese in electron energy-loss spectroscopy. This 1D CNN takes signals describing the bonding enviroment in transition metals and it accurately classifies the valence of the material exceeding 99% test accuracy. The CNN has proven to be robust to chemical shifts (the real-world signal is capable of sliding temporally) and is deemed temporally invariant across the energy spectrum. It is robust to noise after using PCA as a form of data augmentation. PCA is effective at modeling the real noise found in EELS signals.
 
 ## Dependencies
 - HyperSpy 1.3
