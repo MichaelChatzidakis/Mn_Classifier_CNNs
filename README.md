@@ -1,4 +1,4 @@
-# Mn_Classifier_CNNs
+# Machine Learning Spectroscopy
 A convolutional neural network (CNN) classifier for determining the oxidation state of Manganese in electron energy-loss spectroscopy. This 1D CNN takes signals describing the bonding enviroment in transition metals and it accurately classifies the valence of the material exceeding 99% test accuracy. The CNN has proven to be robust to chemical shifts (the real-world signal is capable of sliding temporally) and is deemed temporally invariant across the energy spectrum. It is robust to noise after using PCA as a form of data augmentation. PCA is effective at modeling the real noise found in EELS signals.
 
 ## Dependencies
@@ -20,6 +20,7 @@ Training an MLP
 
 The default settings are for 1000 epochs, batch size of 512, 85/15 train-test split and no PCA data augmentation. These params are all adjustable in `train.py`.
 
+In addition to using `train.py` there is also a Jupyter Notebook file which walks through what happens during training.
 ## Usage (Testing)
 
 Test a CNN named `highest_val_acc_weights_cnn.h5` :
@@ -45,4 +46,5 @@ The usage of using an unknown spectra is as follows:
 
 `python test_unknown_spectra.py`
 
-The path to the file can be specified in the script. HyperSpy is required to load the EELS file.
+The path to the weights can be specified in the script.
+The path to the EELS spectra can be specified in the script. HyperSpy is required to load the EELS file.
