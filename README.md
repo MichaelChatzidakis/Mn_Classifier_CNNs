@@ -12,15 +12,16 @@ A convolutional neural network (CNN) classifier for determining the oxidation st
 
 ## Usage (Training)
 
-Training a CNN
-`python train.py cnn` 
+Training a CNN with name "cnn_aug_2-2-4-8-12-noAug".
+`python train_crossval.py cnn cnn_aug_2-2-4-8-12-noAug` 
 
-Training an MLP
-`python train.py MLP`
+The default settings are for 300 epochs, batch size of 2048, 10-fold stratified cross-validation and PCA data augmentation. These params are all adjustable in `train_crossval.py`.
 
-The default settings are for 1000 epochs, batch size of 512, 85/15 train-test split and no PCA data augmentation. These params are all adjustable in `train.py`.
+This script will make a new directory titled `cnn_aug_2-2-4-8-12-noAug` and save all 10 weights in 10 separate directories. The argument `cnn` can be replaced with `mlp` or `custom` to use other graph architectures. These architectures are found in the build_graph_architecture helper method in the training script.
 
-In addition to using `train.py` there is also a Jupyter Notebook file which walks through what happens during training.
+
+In addition to using `train_crossval.py` there is also a Jupyter Notebook file which walks through what happens during training for a single fold (no cross validation).
+
 ## Usage (Testing)
 
 Test a CNN named `highest_val_acc_weights_cnn.h5` :
