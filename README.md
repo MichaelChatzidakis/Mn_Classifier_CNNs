@@ -1,6 +1,8 @@
 # Machine Learning Spectroscopy
 A convolutional neural network (CNN) classifier for determining the oxidation state of Manganese in electron energy-loss spectroscopy. This 1D CNN takes signals describing the bonding enviroment in transition metals and it accurately classifies the valence of the material exceeding 99% test accuracy. The CNN has proven to be robust to chemical shifts (the real-world signal is capable of sliding temporally) and is deemed temporally invariant across the energy spectrum. It is robust to noise after using PCA as a form of data augmentation. PCA is effective at modeling the real noise found in EELS signals.
 
+See my blog post here for a full explanation including figures: https://www.mikechatzidakis.com/home/2017/11/9/machine-learning-spectroscopy
+
 ## Dependencies
 - HyperSpy 1.3
 - Keras 1.2.1
@@ -12,12 +14,12 @@ A convolutional neural network (CNN) classifier for determining the oxidation st
 
 ## Usage (Training)
 
-Training a CNN with name "cnn_aug_2-2-4-8-12-noAug".
-`python train_crossval.py cnn cnn_aug_2-2-4-8-12-noAug` 
+Training a CNN with name "cnn_model1".
+`python train_crossval.py cnn cnn_model1` 
 
 The default settings are for 300 epochs, batch size of 2048, 10-fold stratified cross-validation and PCA data augmentation. These params are all adjustable in `train_crossval.py`.
 
-This script will make a new directory titled `cnn_aug_2-2-4-8-12-noAug` and save all 10 weights in 10 separate directories. The argument `cnn` can be replaced with `mlp` or `custom` to use other graph architectures. These architectures are found in the build_graph_architecture helper method in the training script.
+This script will make a new directory titled `cnn_model1` and save all 10 weights in 10 separate directories. The argument `cnn` can be replaced with `mlp` or `custom` to use other graph architectures. These architectures are found in the build_graph_architecture helper method in the training script.
 
 
 In addition to using `train_crossval.py` there is also a Jupyter Notebook file which walks through what happens during training for a single fold (no cross validation).
