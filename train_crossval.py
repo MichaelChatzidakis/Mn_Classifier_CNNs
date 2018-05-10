@@ -18,7 +18,7 @@ from keras.layers.convolutional import Convolution1D,AveragePooling1D,MaxPooling
 
 def train(argv):
     #Params
-    epochs = 300
+    epochs = 200
     batch_size = 2048
     train_test_percent = 0.15 #optional
     folds = 10
@@ -50,9 +50,9 @@ def train(argv):
 def load_data():
     #load data
     path_to_input = 'input_spectra'
-    Mn2_C = pd.read_pickle(os.path.join(path_to_input, 'Mn2_Larger_Clean_Thin.pkl'))
-    Mn3_C = pd.read_pickle(os.path.join(path_to_input, 'Mn3_Larger_Clean_Thin.pkl'))
-    Mn4_C = pd.read_pickle(os.path.join(path_to_input, 'Mn4_Larger_Clean_Thin.pkl'))
+    Mn2_C = pd.read_pickle(os.path.join(path_to_input, 'Mn2_615-685eV_thinnest_448.pkl'))
+    Mn3_C = pd.read_pickle(os.path.join(path_to_input, 'Mn3_615-685eV_thin_765.pkl'))
+    Mn4_C = pd.read_pickle(os.path.join(path_to_input, 'Mn4_615-685eV_thin_788.pkl'))
     Mn_All = (Mn2_C.append(Mn3_C, ignore_index=True)).append(Mn4_C, ignore_index=True)
     Mn_All = np.array(Mn_All)
     labels = make_labels(Mn2_C, Mn3_C, Mn4_C)
@@ -85,7 +85,8 @@ def preprocess_crossval_aug(x, y, cv=True, fold=None, n_splits=0, train_test_per
         noise_level = np.dot(pca.transform(noise)[:,nComp:], pca.components_[nComp:,:])
         Xhat += mu
 
-        SNR = np.linspace(1,5,50)
+        snr_num = 200
+        SNR = np.linspace(0,10,snr_num)
         noise_aug = []
         for i  in range(len(SNR)):
             noise_aug.append(SNR[i]*noise_level + Xhat)
@@ -93,29 +94,30 @@ def preprocess_crossval_aug(x, y, cv=True, fold=None, n_splits=0, train_test_per
             for spectra in noise_aug[i]:
                 noise_aug[i][j] = spectra/np.max(spectra)
                 j += 1
-        X_train = np.array(noise_aug).reshape(50*X_train.shape[0], X_train.shape[1])
-        y_train = [item for i in range(50) for item in y_train]
+        X_train = np.array(noise_aug).reshape(snr_num*X_train.shape[0], X_train.shape[1])
+        y_train = [item for i in range(snr_num) for item in y_train]
 
     if crop_spectra == True:
-        X_train, X_test = crop(X_train, X_test, min = 100, max = 600)
+        X_train, X_test = crop(X_train, X_test, min = 200, max = 500) #for test set, cropping to 635-665 eV, closer to qualitative
 
     X_train, X_test, y_train, y_test = preprocess(X_train, X_test, y_train, y_test, mean_center = True, norm = True )
     return (X_train, y_train), (X_test, y_test)
 
 def preprocess(X_train, X_test, y_train, y_test, mean_center = False, norm = True):
     X_train = np.array(X_train).astype('float32')
-    X_train = X_train.reshape(X_train.shape + (1,))
     X_test = np.array(X_test).astype('float32')
-    X_test = X_test.reshape(X_test.shape + (1,))
 
     if mean_center == True:
         X_train -=  np.mean(X_train)
         X_test -= np.mean(X_test)
         print( 'Data mean-centered')
     if norm == True:
-        X_train /= np.max(X_train)
-        X_test /= np.max(X_test)
-        print( 'Data normalized')
+            X_train /= np.max(X_train)
+            X_test /= np.max(X_test)
+            print( 'Data normalized')
+
+    X_test = X_test.reshape(X_test.shape + (1,))
+    X_train = X_train.reshape(X_train.shape + (1,))
 
     y_train = np.array(y_train)
     y_test = np.array(y_test)
@@ -148,7 +150,7 @@ def build_neural_network_graph(graph_type):
     if graph_type == 'cnn':
         model = Sequential()
         activation = 'relu'
-        model.add(Convolution1D(2, 9, input_shape=(500,1), activation=activation))
+        model.add(Convolution1D(2, 9, input_shape=(300,1), activation=activation))
         model.add(BatchNormalization())
         model.add(AveragePooling1D())
 
@@ -168,7 +170,7 @@ def build_neural_network_graph(graph_type):
         model.add(BatchNormalization())
         model.add(AveragePooling1D())
 
-        model.add(Dropout(0.1, seed=23087))
+        model.add(Dropout(0.85, seed=23087))
         model.add(Convolution1D(3, 1))
         model.add(BatchNormalization())
         model.add(GlobalAveragePooling1D())
@@ -180,17 +182,18 @@ def build_neural_network_graph(graph_type):
         print(model.summary())
         print("CNN Model created.")
         return model
+
     elif graph_type=='MLP':
         model = Sequential()
 
-        model.add(Flatten(input_shape=(500,1)))
+        model.add(Flatten(input_shape=(300,1)))
 
         model.add(Dropout(0.5, seed=23087, name='drop1'))
-        model.add(Dense(64, activation='relu'))
+        model.add(Dense(32, activation='relu'))
         model.add(BatchNormalization())
 
         model.add(Dropout(0.5, seed=23087, name='drop9'))
-        model.add(Dense(64,activation='relu'))
+        model.add(Dense(32,activation='relu'))
         model.add(BatchNormalization())
 
         model.add(Dense(3, activation='softmax'))
@@ -204,7 +207,7 @@ def build_neural_network_graph(graph_type):
         print('Custom Model')
         model = Sequential()
         activation = 'relu'
-        model.add(Convolution1D(2, 9, input_shape=(500,1), activation=activation))
+        model.add(Convolution1D(2, 9, input_shape=(300,1), activation=activation))
         model.add(BatchNormalization())
         model.add(AveragePooling1D())
 
@@ -225,11 +228,16 @@ def build_neural_network_graph(graph_type):
         model.add(AveragePooling1D())
 
         model.add(Flatten())
-        model.add(Dropout(0.5, seed=23087))
 
-        model.add(Dense(3))
+        model.add(Dropout(0.5, seed=23087, name='drop1'))
+        model.add(Dense(8, activation='relu'))
+        model.add(BatchNormalization())
 
-        model.add(Activation('softmax', name='loss'))
+        model.add(Dropout(0.5, seed=23087, name='drop9'))
+        model.add(Dense(4,activation='relu'))
+        model.add(BatchNormalization())
+
+        model.add(Dense(3, activation='softmax'))
 
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
