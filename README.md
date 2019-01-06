@@ -25,7 +25,7 @@ This script will make a new directory titled `cnn_model1` and save all 10 weight
 
 In addition to using `train_crossval.py` there is also a Jupyter Notebook file which walks through what happens during training for a single fold (no cross validation).
 
-## Usage (Testing the digitized reference spectra dataset (.pkl of many files)
+## Usage (Testing the digitized reference spectra dataset (.pkl of many files) )
 
 `python test_digitized_spectra.py`
 
