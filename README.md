@@ -15,15 +15,22 @@ Just a note. This is not a maintained repository. It is a collection of scripts.
 
 ## Usage (Training)
 
-Training a CNN with name "cnn_model1".
-`python train_crossval.py cnn cnn_model1` 
+Training a CNN with name "cnn_model1" with 1x translation training augmentation.
+`python train_crossval.py cnn 1 cnn_model1` 
 
-The default settings are for 300 epochs, batch size of 2048, 10-fold stratified cross-validation and PCA data augmentation. These params are all adjustable in `train_crossval.py`.
+The default settings are for 500 epochs, batch size of 512, 10-fold stratified cross-validation and no PCA data augmentation. These params are all adjustable in `train_crossval.py`.
 
 This script will make a new directory titled `cnn_model1` and save all 10 weights in 10 separate directories. The argument `cnn` can be replaced with `mlp` or `custom` to use other graph architectures. These architectures are found in the build_graph_architecture helper method in the training script.
 
 
 In addition to using `train_crossval.py` there is also a Jupyter Notebook file which walks through what happens during training for a single fold (no cross validation).
+
+## Usage (Testing the digitized reference spectra dataset (.pkl of many files)
+
+`python test_digitized_spectra.py`
+
+This will run the models specified in the script ( `neural_network_name` ) and use the the file of spectra found in `data_path` everything will be evaluated using 10-fold cross validation.
+
 
 ## Usage (Testing)
 
